@@ -5,9 +5,9 @@ import glob
 import time
 from functools import partial
 
-FOLDER_WITH_PICTURES = ""
-FOLDER_WITH_FONTS = ""
-INITIAL_IMAGE = ""
+FOLDER_WITH_PICTURES = "/home/user/nasapictures/"
+FOLDER_WITH_FONTS = "/usr/share/fonts/"
+INITIAL_IMAGE = "image2.png"
 
 with open("shuffle.py", "r") as f:
     TEXT = f.read()
@@ -126,7 +126,7 @@ def duplicate_columns(image: Image.Image):
             break
 
 
-def reverse_pixels_in_columns(image: Image.Image):
+def sort_pixels_in_columns(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
@@ -277,7 +277,7 @@ def shuffle_image(image_path: str):
                 duplicate_columns,
                 duplicate_rows,
                 sort_pixels_in_row,
-                reverse_pixels_in_columns,
+                sort_pixels_in_columns,
                 shuffle_colors_in_pixel_row,
                 shuffle_colors_in_pixel_column,
                 sort_colors_in_pixel_row,
