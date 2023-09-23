@@ -5,6 +5,10 @@ import glob
 import time
 from functools import partial
 
+FOLDER_WITH_PICTURES = ""
+FOLDER_WITH_FONTS = ""
+INITIAL_IMAGE = ""
+
 with open("shuffle.py", "r") as f:
     TEXT = f.read()
 
@@ -20,7 +24,8 @@ def display_image(image: Image.Image):
         pygame.image.fromstring(image.tobytes(), image.size, image.mode), (0, 0)
     )
     pygame.display.update()
-    # clock.tick(75)
+    clock.tick(60)
+    return random.randint(0, 5000) == 5000
 
 
 def shuffle_pixels(image: Image.Image):
@@ -61,254 +66,197 @@ def shuffle_rows(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
-    case = random.randint(0, 1)
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
+    for i in reversed(range(height)) if case() else range(height):
         j = random.randint(i, height - 1) if case else random.randint(0, i)
         array[i], array[j] = array[j], array[i]
-
-        for x in rrange_2:
+        for x in reversed(range(width)) if case() else range(width):
             pixels[x, i], pixels[x, j] = pixels[x, j], pixels[x, i]
-
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def shuffle_columns(image: Image.Image):
     pixels = image.load()
     width, height = image.size
-    case = random.randint(0, 1)
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
+    for i in reversed(range(width)) if case() else range(width):
         j = random.randint(i, width - 1) if case else random.randint(0, i)
-        for y in rrange_2:
+        for y in reversed(range(height)) if case() else range(height):
             pixels[i, y], pixels[j, y] = pixels[j, y], pixels[i, y]
-
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def duplicate_rows(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
-    case = random.randint(0, 1)
-    repeat = None
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
+    repeat = array[0]
+    for i in reversed(range(height)) if case() else range(height):
         if random.randint(0, 20) == 20:
             repeat = array[i]
-        if repeat:
-            for y in rrange_2:
-                pixels[y, i] = repeat[y]
-        display_image(image)
+        for y in reversed(range(width)) if case() else range(width):
+            pixels[y, i] = repeat[y]
+        if display_image(image):
+            break
 
 
 def duplicate_columns(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
-    case = random.randint(0, 1)
-    repeat = None
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
+    repeat = columns[0]
+    for i in reversed(range(width)) if case() else range(width):
         if random.randint(0, 20) == 20:
             repeat = columns[i]
-        if repeat:
-            for y in rrange_2:
-                pixels[i, y] = repeat[y]
-        display_image(image)
+        for y in reversed(range(height)) if case() else range(height):
+            pixels[i, y] = repeat[y]
+        if display_image(image):
+            break
 
 
 def reverse_pixels_in_columns(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
-    case = random.randint(0, 1)
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
     case_2 = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
-    )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
+    for i in reversed(range(width)) if case() else range(width):
         srtd = sorted(columns[i], reverse=case_2())
-        for y in rrange_2:
+        for y in reversed(range(height)) if case() else range(height):
             pixels[i, y] = srtd[y]
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def sort_pixels_in_row(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
-    case = random.randint(0, 1)
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
     case_2 = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
-    )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
+    for i in reversed(range(height)) if case() else range(height):
         srtd = sorted(array[i], reverse=case_2())
-        for y in rrange_2:
+        for y in reversed(range(width)) if case() else range(width):
             pixels[y, i] = srtd[y]
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def shuffle_colors_in_pixel_row(image: Image.Image):
     pixels = image.load()
     width, height = image.size
-    case = random.randint(0, 1)
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
-        for j in rrange_2:
+    for i in reversed(range(width)) if case() else range(width):
+        for j in reversed(range(height)) if case() else range(height):
             pixel = list(pixels[i, j])
             random.shuffle(pixel)
             pixels[i, j] = tuple(pixel)
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def shuffle_colors_in_pixel_column(image: Image.Image):
     pixels = image.load()
     width, height = image.size
-    case = random.randint(0, 1)
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
-        for j in rrange_2:
+    for i in reversed(range(height)) if case() else range(height):
+        for j in reversed(range(width)) if case() else range(width):
             pixel = list(pixels[j, i])
             random.shuffle(pixel)
             pixels[j, i] = tuple(pixel)
-        display_image(image)
+        if display_image(image):
+            break
 
 
 def sort_colors_in_pixel_row(image: Image.Image):
     pixels = image.load()
     width, height = image.size
-    case = random.randint(0, 1)
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
     case_2 = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
-    )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
-        for j in rrange_2:
+    for i in reversed(range(width)) if case() else range(width):
+        for j in reversed(range(height)) if case() else range(height):
             pixel = sorted(list(pixels[i, j]), reverse=case_2())
             pixels[i, j] = tuple(pixel)
-        display_image(image)
-
+        if display_image(image):
+            break
 
 def sort_colors_in_pixel_column(image: Image.Image):
     pixels = image.load()
     width, height = image.size
-    case = random.randint(0, 1)
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
     case_2 = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
-    )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
-        for j in rrange_2:
+    for i in reversed(range(height)) if case() else range(height):
+        for j in reversed(range(width)) if case() else range(width):
             pixel = sorted(list(pixels[j, i]), reverse=case_2())
             pixels[j, i] = tuple(pixel)
-        display_image(image)
-
+        if display_image(image):
+            break
 
 def reverse_pixels_in_row(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
-    case = random.randint(0, 1)
-    case_2 = random.choice(
+    case = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, height if case_3 else random.randint(2, height)))
-        if case
-        else range(1, height if case_3 else random.randint(2, height))
+    case_2 = random.choice(
+        (lambda: True, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(width if case_3 else random.randint(1, width))
-    for i in rrange:
+    for i in reversed(range(height)) if case() else range(height):
         rvrsd = list(reversed(array[i]))
-        for y in rrange_2:
-            pixels[y, i] = rvrsd[y]
-        display_image(image)
-
+        for y in reversed(range(width)) if case() else range(width):
+            pixels[y, i] = rvrsd[y] if case_2() else array[i][y]
+        if display_image(image):
+            break
 
 def reverse_pixels_in_columns(image: Image.Image):
     pixels = image.load()
     width, height = image.size
     columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
-    case = random.randint(0, 1)
-    case_2 = random.choice(
+    case = random.choice(
         (lambda: True, lambda: False, partial(random.choice, (True, False)))
     )
-    case_3 = random.randint(0, 1)
-    rrange = (
-        reversed(range(1, width if case_3 else random.randint(2, width)))
-        if case
-        else range(1, width if case_3 else random.randint(2, width))
+    case_2 = random.choice(
+        (lambda: True, partial(random.choice, (True, False)))
     )
-    rrange_2 = range(height if case_3 else random.randint(1, height))
-    for i in rrange:
+    for i in reversed(range(width)) if case() else range(width):
         rvrsd = list(reversed(columns[i]))
-        for y in rrange_2:
-            pixels[i, y] = rvrsd[y]
-        display_image(image)
-
+        for y in reversed(range(height)) if case() else range(height):
+            pixels[i, y] = rvrsd[y] if case_2() else columns[i][y]
+        if display_image(image):
+            break
 
 def shuffle_image(image_path: str):
     global screen, clock
@@ -319,10 +267,8 @@ def shuffle_image(image_path: str):
     pygame.init()
     screen = pygame.display.set_mode(image.size, pygame.FULLSCREEN)
     clock = pygame.time.Clock()
-    pictures = glob.glob("/home/user/nasapictures/*")
+    pictures = glob.glob(FOLDER_WITH_PICTURES + "/*.*")
     while True:
-        # image = Image.open(image_path)
-        # image = image.resize((1080, 1080))
         effect = random.choice(
             (
                 shuffle_rows,
@@ -340,12 +286,7 @@ def shuffle_image(image_path: str):
                 reverse_pixels_in_columns,
             )
         )
-        # effect = random.choice((reverse_pixels_in_columns, reverse_pixels_in_row))
-        # fav effect
-        # effect = random.choice((sort_pixels_in_row, sort_pixels_in_columns, shuffle_colors_in_pixel_row, shuffle_colors_in_pixel_column, sort_colors_in_pixel_row, sort_colors_in_pixel_column))
-        # print(effect.__name__)
         effect(image)
-        # display_image(image)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -402,7 +343,7 @@ def shuffle_image(image_path: str):
                 try:
                     font = ImageFont.FreeTypeFont(
                         random.choice(
-                            glob.glob("/usr/share/fonts/*/*.ttf", recursive=True)
+                            glob.glob(FOLDER_WITH_FONTS + "/*/*.ttf", recursive=True)
                         ),
                         random.randint(10, 25),
                         encoding="utf-8",
@@ -426,5 +367,4 @@ def shuffle_image(image_path: str):
 
 
 if __name__ == "__main__":
-    input_image_path = "image2.png"
-    shuffle_image(input_image_path)
+    shuffle_image(INITIAL_IMAGE)
