@@ -25,8 +25,7 @@ def display_image(image: Image.Image):
     )
     pygame.display.update()
     clock.tick(60)
-    return random.randint(0, 5000) == 5000
-
+    return random.randint(0, 10000) == 10000
 
 def shuffle_pixels(image: Image.Image):
     width, height = image.size
@@ -161,6 +160,73 @@ def sort_pixels_in_row(image: Image.Image):
         if display_image(image):
             break
 
+def correct_sort_pixels_in_row(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_2 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(height)) if case() else range(height):
+        srtd = sorted(array[i], key=lambda x: sum(x), reverse=case_2())
+        for y in reversed(range(width)) if case() else range(width):
+            pixels[y, i] = srtd[y]
+        if display_image(image):
+            break
+
+def correct_sort_pixels_in_columns(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_2 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(width)) if case() else range(width):
+        srtd = sorted(columns[i], key=lambda x: sum(x), reverse=case_2())
+        for y in reversed(range(height)) if case() else range(height):
+            pixels[i, y] = srtd[y]
+        if display_image(image):
+            break
+
+def sort_pixels_by_brightness_in_row(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_2 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(height)) if case() else range(height):
+        srtd = sorted(array[i], key=lambda x: 0.299 * x[0] + 0.587 * x[1] + 0.114 * x[2], reverse=case_2())
+        for y in reversed(range(width)) if case() else range(width):
+            pixels[y, i] = srtd[y]
+        if display_image(image):
+            break
+
+def sort_pixels_by_brightness_in_columns(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_2 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(width)) if case() else range(width):
+        srtd = sorted(columns[i], key=lambda x: 0.299 * x[0] + 0.587 * x[1] + 0.114 * x[2], reverse=case_2())
+        for y in reversed(range(height)) if case() else range(height):
+            pixels[i, y] = srtd[y]
+        if display_image(image):
+            break
 
 def shuffle_colors_in_pixel_row(image: Image.Image):
     pixels = image.load()
@@ -278,6 +344,10 @@ def shuffle_image(image_path: str):
                 duplicate_rows,
                 sort_pixels_in_row,
                 sort_pixels_in_columns,
+                correct_sort_pixels_in_row,
+                correct_sort_pixels_in_columns,
+                sort_pixels_by_brightness_in_columns,
+                sort_pixels_by_brightness_in_row,
                 shuffle_colors_in_pixel_row,
                 shuffle_colors_in_pixel_column,
                 sort_colors_in_pixel_row,
