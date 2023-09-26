@@ -1,16 +1,16 @@
 from PIL import Image
-import glob
 import random
 
-MAX_THRESHOLD = 0.8
-MIN_THRESHOLD = 0.2
-ROW = False
-REVERSED = True
+MIN_THRESHOLD = random.randint(50, 450) / 1000
+MAX_THRESHOLD = random.randint(550, 950) / 1000
+ROW = random.choice((True, False))
+REVERSED = random.choice((True, False))
 
-random_nasa_picture = random.choice(glob.glob("/home/user/nasapictures/*.*"))
-image = Image.open(random_nasa_picture)
+image = Image.open("who.jpg")
+image = image.resize((1920, 1080))
 width, height = image.size
 pixels = image.load()
+
 
 ARRAY = {i: [] for i in range(height if ROW else width)}
 START = -1
@@ -26,13 +26,11 @@ for i in range(height if ROW else width):
                 START = o
             END = o
         elif START != -1:
-            if START != END:
-                ARRAY[i].append((START, END))
+            ARRAY[i].append((START, END))
             START = -1
             END = -1
     if START != -1:
-        if START != END:
-            ARRAY[i].append((START, END))
+        ARRAY[i].append((START, END))
         START = -1
         END = -1
 

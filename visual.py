@@ -19,10 +19,9 @@ with open("english_words.txt", "r") as f:
     ENGLISH_WORDS = f.read().split("\n")
 
 SAVE = False
-DO_NOT_SKIP = False
 
 def display_image(image: Image.Image):
-    global SAVE, DO_NOT_SKIP
+    global SAVE
     screen.blit(
         pygame.image.fromstring(image.tobytes(), image.size, image.mode), (0, 0)
     )
@@ -35,10 +34,9 @@ def display_image(image: Image.Image):
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_SPACE:
                 SAVE = True
-                DO_NOT_SKIP = True
             elif event.key == pygame.K_s:
                 return True
-    return not DO_NOT_SKIP and random.randint(0, 10000) == 10000 
+    return
 
 def shuffle_pixels(image: Image.Image):
     width, height = image.size
@@ -390,6 +388,50 @@ def reverse_pixels_in_columns(image: Image.Image):
         if display_image(image):
             break
 
+def unusual_sorting(image: Image.Image):
+    MIN_THRESHOLD = random.randint(50, 450) / 1000
+    MAX_THRESHOLD = random.randint(550, 950) / 1000
+    ROW = random.choice((True, False))
+    REVERSED = random.choice((True, False))
+
+    width, height = image.size
+    pixels = image.load()
+
+    ARRAY = {i: [] for i in range(height if ROW else width)}
+    START = -1
+    END = -1
+
+    for i in range(height if ROW else width):
+        for o in range(width if ROW else height):
+            pixel = pixels[o, i] if ROW else pixels[i, o]
+            pixel = list(map(lambda x: x / 255, pixel))
+            brightness = 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2]
+            if brightness > MIN_THRESHOLD and MAX_THRESHOLD > brightness:
+                if START == -1:
+                    START = o
+                END = o
+            elif START != -1:
+                ARRAY[i].append((START, END))
+                START = -1
+                END = -1
+        if START != -1:
+            ARRAY[i].append((START, END))
+            START = -1
+            END = -1
+
+    for i in ARRAY:
+        for line in ARRAY[i]:
+            start, end = line
+            pixel_array = []
+            for o in range(start, end):
+                pixel_array.append(pixels[o, i] if ROW else pixels[i, o])
+            pixel_array = sorted(pixel_array, key=lambda pixel: 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2], reverse=REVERSED)
+            for o, pixel in zip(range(start, end), pixel_array):
+                image.putpixel((o, i) if ROW else (i, o), pixel)
+        if display_image(image):
+            break
+
+
 def main(image_path: str):
     global screen, clock, SAVE, DO_NOT_SKIP
 
@@ -420,13 +462,13 @@ def main(image_path: str):
                 sort_colors_in_pixel_column,
                 reverse_pixels_in_row,
                 reverse_pixels_in_columns,
+                unusual_sorting
             )
         )
         effect(image)
         if SAVE:
             image.save(f"{int(time.time())}.png")
             SAVE = False
-        DO_NOT_SKIP = False
         if random.randint(0, 2) == 0:
             for i in range(random.randint(3, 15)):
                 if random.randint(0, 2) == 0:
