@@ -431,9 +431,92 @@ def unusual_sorting(image: Image.Image):
         if display_image(image):
             break
 
+def shuffle_pixels_in_row(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    array = [list(pixels[x, y] for x in range(width)) for y in range(height)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_3 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(height)) if case() else range(height):
+        shfld = array[i].copy()
+        random.shuffle(shfld)
+        for y in reversed(range(width)) if case_3() else range(width):
+            pixels[y, i] = shfld[y]
+        if display_image(image):
+            break
+
+def shuffle_pixels_in_columns(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    columns = [list(pixels[x, y] for y in range(height)) for x in range(width)]
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_3 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(width)) if case() else range(width):
+        shfld = columns[i].copy()
+        random.shuffle(shfld)
+        for y in reversed(range(height)) if case_3() else range(height):
+            pixels[i, y] = shfld[y]
+        if display_image(image):
+            break
+
+def average_in_row(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    R = G = B = 0
+    array = []
+    for y in range(height):
+        for x in range(width):
+            R = R + pixels[x, y][0]
+            G = G + pixels[x, y][1]
+            B = B + pixels[x, y][2]
+        array.append((R // width, G // width, B // width))
+        R = G = B = 0
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_3 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(height)) if case() else range(height):
+        for y in reversed(range(width)) if case_3() else range(width):
+            pixels[y, i] = array[i]
+        if display_image(image):
+            break
+
+def average_in_column(image: Image.Image):
+    pixels = image.load()
+    width, height = image.size
+    R = G = B = 0
+    array = []
+    for x in range(width):
+        for y in range(height):
+            R = R + pixels[x, y][0]
+            G = G + pixels[x, y][1]
+            B = B + pixels[x, y][2]
+        array.append((R // height, G // height, B // height))
+        R = G = B = 0
+    case = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    case_3 = random.choice(
+        (lambda: True, lambda: False, partial(random.choice, (True, False)))
+    )
+    for i in reversed(range(width)) if case() else range(width):
+        for y in reversed(range(height)) if case_3() else range(height):
+            pixels[i, y] = array[i]
+        if display_image(image):
+            break
 
 def main(image_path: str):
-    global screen, clock, SAVE, DO_NOT_SKIP
+    global screen, clock, SAVE
 
     image = Image.open(image_path)
     image = image.resize((1920, 1080))
@@ -462,7 +545,11 @@ def main(image_path: str):
                 sort_colors_in_pixel_column,
                 reverse_pixels_in_row,
                 reverse_pixels_in_columns,
-                unusual_sorting
+                unusual_sorting,
+                shuffle_pixels_in_row,
+                shuffle_pixels_in_columns,
+                average_in_row,
+                average_in_column
             )
         )
         effect(image)

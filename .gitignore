@@ -1,3 +1,5 @@
 *.jpg
 *.png
 *.txt
+final/
+__pycache__/
